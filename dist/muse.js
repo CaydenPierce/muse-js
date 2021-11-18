@@ -134,6 +134,8 @@ var muse_parse_1 = require('./lib/muse-parse');
 var muse_utils_1 = require('./lib/muse-utils');
 var zip_samples_1 = require('./lib/zip-samples');
 exports.zipSamples = zip_samples_1.zipSamples;
+var zip_samplesPpg_1 = require('./lib/zip-samplesPpg');
+exports.zipSamplesPpg = zip_samplesPpg_1.zipSamplesPpg;
 exports.MUSE_SERVICE = 0xfe8d;
 var CONTROL_CHARACTERISTIC = '273e0001-4c4d-454d-96be-f03bac821358';
 var TELEMETRY_CHARACTERISTIC = '273e000b-4c4d-454d-96be-f03bac821358';
@@ -145,7 +147,7 @@ var PPG_CHARACTERISTICS = [
     '273e0011-4c4d-454d-96be-f03bac821358',
 ];
 exports.PPG_FREQUENCY = 64;
-exports.PPG_SAMPLES_PER_READING = 12;
+exports.PPG_SAMPLES_PER_READING = 6;
 var EEG_CHARACTERISTICS = [
     '273e0003-4c4d-454d-96be-f03bac821358',
     '273e0004-4c4d-454d-96be-f03bac821358',
@@ -292,6 +294,7 @@ var MuseClient = /** @class */ (function() {
                                                         timestamp: _this.getTimestamp(
                                                             eventIndex,
                                                             exports.PPG_SAMPLES_PER_READING,
+                                                            exports.PPG_FREQUENCY,
                                                         ),
                                                     };
                                                 }),
@@ -347,6 +350,7 @@ var MuseClient = /** @class */ (function() {
                                                         timestamp: _this.getTimestamp(
                                                             eventIndex,
                                                             exports.EEG_SAMPLES_PER_READING,
+                                                            exports.EEG_FREQUENCY,
                                                         ),
                                                     };
                                                 }),
@@ -491,8 +495,8 @@ var MuseClient = /** @class */ (function() {
             this.connectionStatus.next(false);
         }
     };
-    MuseClient.prototype.getTimestamp = function(eventIndex, samplesPerReading) {
-        var READING_DELTA = 1000 * (1.0 / exports.EEG_FREQUENCY) * samplesPerReading;
+    MuseClient.prototype.getTimestamp = function(eventIndex, samplesPerReading, frequency) {
+        var READING_DELTA = 1000 * (1.0 / frequency) * samplesPerReading;
         if (this.lastIndex === null || this.lastTimestamp === null) {
             this.lastIndex = eventIndex;
             this.lastTimestamp = new Date().getTime() - READING_DELTA;
